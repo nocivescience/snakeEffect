@@ -314,7 +314,7 @@ class Particle {
     CTX.shadowColor = `rgb(${r},${g},${b},${1})`;
     CTX.shadowBlur = 0;
     CTX.globalCompositeOperation = "lighter";
-    CTX.fillStyle = `${this.color}`;
+    CTX.fillStyle = `rgb(${r},${g},${b},${1})`;
     CTX.fillRect(x, y, this.size, this.size);
     CTX.globalCompositeOperation = "source-over";
   }
