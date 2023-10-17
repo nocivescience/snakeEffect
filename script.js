@@ -22,9 +22,7 @@ let snake,
   score = 0,
   maxScore = window.localStorage.getItem("maxScore") || undefined,
   particles = [],
-  particlesScore = [],
   splashingParticleCount = 20,
-  splashingParticleCountScore = 30,
   cellsCount,
   requestID;
 
@@ -61,11 +59,6 @@ let helpers = {
       }
     }
   },
-
-  garbageCollectorScore() {
-
-  },
-
   drawGrid() {
     CTX.lineWidth = 1.1;
     CTX.strokeStyle = "#232332";
@@ -246,7 +239,6 @@ class Snake {
       if (helpers.isCollision(this.pos, food.pos)) {
         incrementScore();
         particleSplash();
-        particleSplashScore();
         food.spawn();
         this.total++;
       }
@@ -296,7 +288,7 @@ class Food {
 class Particle {
   constructor(pos, color, size, vel) {
     this.pos = pos;
-    this.color = 'white';
+    this.color = color;
     this.size = Math.abs(size / 2);
     this.ttl = 0;
     this.gravity = -0.2;
@@ -327,35 +319,6 @@ class Particle {
   }
 }
 
-class ParticleScore {
-  constructor(pos, color, size, vel) {
-    this.pos = pos;
-    this.color = color;
-    this.size = Math.abs(size / 2);
-    this.ttl = 0;
-    this.gravity = -0.4;
-    this.vel = vel;
-  }
-  draw(){
-    let {x, y} = this.pos;
-    let hsl = this.color.split('').filter(l=>l.match(/[^hsl()$% ]/g)).join('').split(',').map(n=>+n);
-    let [r,g,b] = helpers.hsl2rgb(hsl[0],hsl[1]/100,hsl[2]/100);
-    CTX.shadowColor = `rgb(${r},${g},${b},${1})`;
-    CTX.shadowBlur = 0;
-    CTX.globalCompositeOperation = 'lighter';
-    CTX.fillStyle = `rgb(${r},${g},${b},${1})`;
-    CTX.fillRect(x,y,this.size,this.size);
-    CTX.globalCompositeOperation = 'source-over';
-  }
-  update(){
-    this.draw();
-    this.size -= 0.3;
-    this.ttl += 1;
-    this.pos.add(this.vel);
-    this.vel.y -= this.gravity;
-  }
-}
-
 function incrementScore() {
   score++;
   dom_score.innerText = score.toString().padStart(2, "0");
@@ -366,14 +329,6 @@ function particleSplash() {
     let vel = new helpers.Vec(Math.random() * 6 - 3, Math.random() * 6 - 3);
     let position = new helpers.Vec(food.pos.x, food.pos.y);
     particles.push(new Particle(position, currentHue, food.size, vel));
-  }
-}
-
-function particleSplashScore() {
-  for (let i = 0; i < splashingParticleCountScore; i++) {
-    let vel = new helpers.Vec(Math.random() * 6 - 3, Math.random() * 6 - 3);
-    let position = new helpers.Vec(food.pos.x, food.pos.y);
-    particlesScore.push(new ParticleScore(position, currentHue, food.size, vel));
   }
 }
 
@@ -400,9 +355,6 @@ function loop() {
     snake.update();
     food.draw();
     for (let p of particles) {
-      p.update();
-    }
-    for (let p of particlesScore) {
       p.update();
     }
     helpers.garbageCollector();
@@ -437,7 +389,3 @@ function reset() {
 }
 
 initialize();
-
-function decorateScore() {
-
-}
