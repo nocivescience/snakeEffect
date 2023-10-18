@@ -14,6 +14,7 @@ const H = (dom_canvas.height = 400);
 
 let snake,
   food,
+  newFood,
   currentHue,
   cells = 20,
   cellSize,
@@ -239,7 +240,11 @@ class Snake {
       if (helpers.isCollision(this.pos, food.pos)) {
         incrementScore();
         particleSplash();
+        for(let i = 0; i < 50; i++){
+          particleSplashInit(400*Math.random(), 400*Math.random());
+        }
         food.spawn();
+        newFood.spawn();
         this.total++;
       }
       this.history[this.total - 1] = new helpers.Vec(this.pos.x, this.pos.y);
@@ -332,6 +337,14 @@ function particleSplash() {
   }
 }
 
+function particleSplashInit(posX=400, posY=400) {
+  for (let i = 0; i < splashingParticleCount; i++) {
+    let vel = new helpers.Vec(Math.random() * 6 - 3, Math.random() * 6 - 3);
+    let position = new helpers.Vec(posX, posY);
+    particles.push(new Particle(position, currentHue, food.size, vel));
+  }
+}
+
 function clear() {
   CTX.clearRect(0, 0, W, H);
 }
@@ -343,6 +356,11 @@ function initialize() {
   cellSize = W / cells;
   snake = new Snake();
   food = new Food();
+  newFood= new Food();
+  newFood.pos= new helpers.Vec(
+    ~~(Math.random() * cells) * cellSize,
+    ~~(Math.random() * cells) * cellSize
+  );
   dom_replay.addEventListener("click", reset, false);
   loop();
 }
@@ -358,6 +376,11 @@ function loop() {
       p.update();
     }
     helpers.garbageCollector();
+    // newFood.pos= new helpers.Vec(
+    //   ~~(Math.random() * cells) * cellSize,
+    //   ~~(Math.random() * cells) * cellSize
+    // );
+    newFood.draw();
   } else {
     clear();
     gameOver();
